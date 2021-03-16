@@ -7,22 +7,25 @@ const useFetch = (url) => {
     const [error, seterror] = useState(null)
 
     useEffect(() => {
+        const abortCont = new AbortController();
 
         console.log('DOJO APP > Connecting to REST API')
 
         const fetchData = async () => {
-            const res = await fetch(url)
+            const res = await fetch(url, { signal: abortCont.signal })
 
              seterror(null)
             if (!res.ok) {
                 seterror('data not available')
             }
             const data = await res.json()
-    
+            
             setdata(data)
             setisPending(false)
         }
         fetchData()
+
+        return () => abortCont.abort()
     }, [url]) // [] array dependancy 
 
     return { data, isPending, error }
